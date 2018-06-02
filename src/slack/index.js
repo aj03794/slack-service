@@ -15,63 +15,67 @@ export const initalizeSlack = ({
     .then(({ allMsgs, filterMsgs }) => {
         filterMsgs(msg => {
             if (msg.data) {
-							console.log('msg', JSON.parse(msg.data[1]))
-                const { motionDetected, text } = JSON.parse(msg.data[1])
-                if (motionDetected && text) {
-									return true
-								}
-								return false
+				console.log('msg', JSON.parse(msg.data[1]))
+                const { slackData } = JSON.parse(msg.data[1])
+                if (slackData) {
+					return true
+				}
+				return false
             }
             return false
         })
-				.subscribe(msg => {
-					// const { motionDetected, text } = JSON.parse(msg.data[1])
-          console.log('filteredMsg - motionDetected', JSON.parse(msg.data[1]))
-          enqueue({ msg: JSON.parse(msg.data[1]), queue, slack, token })
+		.subscribe(msg => {
+          	console.log('filteredMsg - motionDetected', JSON.parse(msg.data[1]))
+          	enqueue({ msg: JSON.parse(msg.data[1]), queue, slack, token })
         })
     })
-	// slack.auth.test({ token })
-	// .then(console.log)
-	// // .catch(err => console.log('error occurred', err))
-	// .then(() => {
-	// 	return slack.chat.postMessage({ token, channel: 'general', text: 'Hello world' })
-	// })
-	// .then(result => console.log('result', result))
-	// .then()
 }
 
 const postSlackMessage = ({
 	slack,
-	channel='general',
-	messageToPostToSlack='Default message',
+	slackData: {
+		channel = 'general',
+		msg = 'default message'
+	},
 	token
 }) => new Promise((resolve, reject) => {
-	console.log('messageToPostToSlack', messageToPostToSlack)
+	console.log('channel', channel)
+	console.log('msg', msg)
 	console.log('token', token)
 	console.log('slack', slack ? true : false)
-	slack.chat.postMessage({ token, channel, text: messageToPostToSlack  })
-	.then(() => resolve({
-		method: 'postSlackMessage',
-		data: {
-			success: true,
-			err: null
-		}
-	}))
-	.catch(err => reject({
-		method: 'postSlackMessage',
-		data: {
-			success: false,
-			err
-		}
-	}))
+	slack.chat.postMessage({ token, channel, text: JSON.stringify(msg)  })
+	.then(() => {
+		console.log('Slack message post success')
+		resolve({
+			method: 'postSlackMessage',
+			data: {
+				success: true,
+				err: null
+			}
+		})
+	})
+	.catch(err => {
+		console.log('Slack message post failure', err)
+		reject({
+			method: 'postSlackMessage',
+			data: {
+				success: false,
+				err
+			}
+		})
+	})
 })
 
 export const q = ({ publish }) => queue(({ msg, slack, token }, cb) => {
-	const { text, motionDetected } = msg
-	const messageToPostToSlack = `${text}: ${motionDetected}`
 
-  postSlackMessage({ slack, messageToPostToSlack, token })
-  .then(result => {
+	const { slackData } = msg
+
+	postSlackMessage({
+		slack,
+		slackData,
+		token
+	})
+	.then(result => {
 		console.log(result)
 		cb()
 	})
