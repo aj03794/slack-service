@@ -4,12 +4,12 @@ import slack from 'slack'
 
 import { initalizeSlack } from './slack'
 
-console.log('---->', process.env.SLACK_OAUTH_TOKEN)
+console.log('---->', SLACK_OAUTH_TOKEN)
 
 const { publish, subscribe } = redis()
 initalizeSlack({
 	slack,
-	token: process.env.SLACK_OAUTH_TOKEN,
+	token: SLACK_OAUTH_TOKEN,
 	publish,
 	subscribe
 })
