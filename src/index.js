@@ -14,10 +14,23 @@ Promise.all([
 	{ publish },
 	{ subscribe }
 ]) => {
-	initalizeSlack({
+	// console.log('subscribe', subscribe)
+	// const { allMsgs, filterMsgs } = subscribe({ channel: 'slack' })
+	// subscribe({
+	// 	channel: 'slack'
+	// })
+	// .then(({
+	// 	allMsgs,
+	// 	filterMsgs
+	// }) => {
+		// allMsgs(msg => {
+		// 	console.log('MSG', msg)
+		// })
+	return initalizeSlack({
 		slack,
 		token: process.env.SLACK_OAUTH_TOKEN,
 		publish,
 		subscribe
 	})
+	// })
 })

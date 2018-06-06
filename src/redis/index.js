@@ -64,7 +64,7 @@ export const publisher = () => new Promise(resolve => {
 	})
 })
 
-export const subscriber = () => new Promise(resolve => {
+export const subscriber = () => {
 	const { connect } = getClient({ type: 'subscriber' })
 	return connect().then(client => {
 		const {
@@ -72,12 +72,14 @@ export const subscriber = () => new Promise(resolve => {
 			filter: filterMsgs,
 			next
 		} = createSubject()
-		client.on('error', (...args) => {
-			console.log('subscriber - error', args)
-		})
+
 		client.on('connect', (...args) => {
 			console.log('Connected to Redis')
-			// ...args looks like [ 'motion sensor', '{"msg":{"motion":false}}' ]
+
+			client.on('error', (...args) => {
+				console.log('subscriber - error', args)
+			})
+			
 			client.on('message', (...args) => {
 				next({
 					meta: {
@@ -87,16 +89,25 @@ export const subscriber = () => new Promise(resolve => {
 					data: args
 				})
 			})
+
+			next({
+				meta: {
+					type: 'connect',
+					timestamp: new Date().getTime(),
+					data: args
+				}
+			})
 		})
-		return resolve({
+		return {
 			subscribe: ({
 				channel
 			}) => new Promise(resolve => {
+				client.subscribe(channel)
 				return resolve({
 					allMsgs,
 					filterMsgs
 				})
 			})
-		})
+		}
 	})
-})
+}
