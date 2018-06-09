@@ -11,7 +11,6 @@ export const initalizeSlack = ({
 	subscribe({
         channel: 'slack'
     })
-    .then(({ connect }) => connect())
     .then(({ allMsgs, filterMsgs }) => {
         filterMsgs(msg => {
             if (msg.data) {
