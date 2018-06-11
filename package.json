@@ -15,7 +15,7 @@
     "async": "^2.6.1",
     "create-subject-with-filter": "0.0.5",
     "dotenv": "^5.0.1",
-    "pub-sub-redis": "0.0.2",
+    "pub-sub-redis": "0.0.3",
     "redis": "^2.8.0",
     "slack": "^11.0.0"
   },
