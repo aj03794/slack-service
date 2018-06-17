@@ -1,4 +1,5 @@
 import { queue } from 'async'
+import fs from 'fs'
 
 export const initalizeSlack = ({
 	slack,
@@ -6,7 +7,6 @@ export const initalizeSlack = ({
 	subscribe,
 	publish
 }) => {
-	// console.log('token', token)
 	const queue = q({ publish })
 	subscribe({
         channel: 'slack'
@@ -38,10 +38,7 @@ const postSlackMessage = ({
 	},
 	token
 }) => new Promise((resolve, reject) => {
-	console.log('channel', channel)
 	console.log('msg', msg)
-	console.log('token', token)
-	console.log('slack', slack ? true : false)
 	slack.chat.postMessage({ token, channel, text: JSON.stringify(msg)  })
 	.then(() => {
 		console.log('Slack message post success')
@@ -65,20 +62,75 @@ const postSlackMessage = ({
 	})
 })
 
+const uploadFile = ({
+	slack,
+	slackData: {
+		channel = 'general',
+		msg = 'default message'
+	},
+	token,
+	file
+}) => new Promise((resolve, reject) => {
+	console.log('FILE', file)
+	slack.files.upload({ token, channels: channel, file: fs.createReadStream(file) })
+	.then(() => {
+		console.log('Slack upload file success')
+		resolve({
+			method: 'uploadFile',
+			data: {
+				success: true,
+				err: null
+			}
+		})
+	})
+	.catch(err => {
+		console.log('Slack upload file failure', err)
+		reject({
+			method: 'uploadFile',
+			data: {
+				success: false,
+				err
+			}
+		})
+	})
+})
+
 export const q = ({ publish }) => queue(({ msg, slack, token }, cb) => {
-
+	console.log('MSGGGGGG', msg)
 	const { slackData } = msg
-
-	postSlackMessage({
-		slack,
-		slackData,
-		token
-	})
-	.then(result => {
-		console.log(result)
-		cb()
-	})
-	.catch(err => console.log(err))
+	switch(slackData.msg.operation) {
+		case 'FILE_UPLOAD':
+			console.log('File upload case')
+			return uploadFile({
+				slack,
+				slackData,
+				token,
+				file: slackData.msg.file
+			})
+			.then(result => {
+				console.log(result)
+				cb()
+			})
+			.catch(err => {
+				console.log(err)
+				cb()
+			})
+		default:
+			console.log('Default case')
+			return postSlackMessage({
+				slack,
+				slackData,
+				token
+			})
+			.then(result => {
+				console.log(result)
+				cb()
+			})
+			.catch(err => {
+				console.log(err)
+				cb()
+			})
+	}
 })
 
 export const enqueue = ({ msg, queue, slack, token }) => new Promise((resolve, reject) => {
