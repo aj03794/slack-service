@@ -24,7 +24,6 @@ export const initalizeSlack = ({
             return false
         })
 		.subscribe(msg => {
-          	console.log('filteredMsg - motionDetected', JSON.parse(msg.data[1]))
           	enqueue({ msg: JSON.parse(msg.data[1]), queue, slack, token })
         })
     })
@@ -96,11 +95,10 @@ const uploadFile = ({
 })
 
 export const q = ({ publish }) => queue(({ msg, slack, token }, cb) => {
-	console.log('MSGGGGGG', msg)
 	const { slackData } = msg
 	switch(slackData.msg.operation) {
 		case 'FILE_UPLOAD':
-			console.log('File upload case')
+			console.log('FILE UPLOAD CASE')
 			return uploadFile({
 				slack,
 				slackData,
@@ -116,7 +114,7 @@ export const q = ({ publish }) => queue(({ msg, slack, token }, cb) => {
 				cb()
 			})
 		default:
-			console.log('Default case')
+			console.log('DEFAULT CASE')
 			return postSlackMessage({
 				slack,
 				slackData,
