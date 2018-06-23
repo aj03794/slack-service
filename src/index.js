@@ -5,7 +5,9 @@ import slack from 'slack'
 import { initalizeSlack } from './slack'
 
 console.log('---->', process.env.SLACK_OAUTH_TOKEN)
-const { publisherCreator, subscriberCreator } = redis()
+const { publisherCreator, subscriberCreator } = redis({
+	host: '127.0.0.1'
+})
 
 Promise.all([
 	publisherCreator(),
