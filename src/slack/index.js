@@ -1,5 +1,6 @@
 import { queue } from 'async'
 import fs from 'fs'
+import { address } from 'ip'
 
 export const initalizeSlack = ({
 	slack,
@@ -15,8 +16,10 @@ export const initalizeSlack = ({
         filterMsgs(msg => {
             if (msg.data) {
 				console.log('msg', JSON.parse(msg.data[1]))
-                const { slackData } = JSON.parse(msg.data[1])
-                if (slackData) {
+				const { slackData, meta } = JSON.parse(msg.data[1])
+				console.log('ipAddress', meta.ipAddress)
+				console.log('ADDRESS', address())
+                if (slackData && meta.ipAddress === address()) {
 					return true
 				}
 				return false
