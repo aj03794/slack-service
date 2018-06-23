@@ -6,7 +6,7 @@ import { initalizeSlack } from './slack'
 
 console.log('---->', process.env.SLACK_OAUTH_TOKEN)
 const { publisherCreator, subscriberCreator } = redis({
-	host: '127.0.0.1'
+	host: process.argv[2] === 'dev' ? '127.0.0.1' : 'main.local'
 })
 
 Promise.all([
