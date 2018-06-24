@@ -17,7 +17,7 @@ export const initalizeSlack = ({
             if (msg.data) {
 				console.log('msg', JSON.parse(msg.data[1]))
 				const { slackData, meta } = JSON.parse(msg.data[1])
-                if (slackData && meta.ipAddress &&meta.ipAddress === address()) {
+                if (slackData && meta && meta.ipAddress &&meta.ipAddress === address()) {
 					console.log('ipAddress', meta.ipAddress)
 					console.log('ADDRESS', address())
 					return true
