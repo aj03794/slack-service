@@ -15,9 +15,9 @@ export const initalizeSlack = ({
     .then(({ allMsgs, filterMsgs }) => {
         filterMsgs(msg => {
             if (msg.data) {
-				console.log('msg', JSON.parse(msg.data[1]))
 				const { slackData, meta } = JSON.parse(msg.data[1])
-                if (slackData && meta && meta.ipAddress &&meta.ipAddress === address()) {
+                if (slackData && meta && meta.ipAddress && meta.ipAddress === address()) {
+					console.log('msg', JSON.parse(msg.data[1]))
 					console.log('ipAddress', meta.ipAddress)
 					console.log('ADDRESS', address())
 					return true
@@ -41,7 +41,7 @@ const postSlackMessage = ({
 	token
 }) => new Promise((resolve, reject) => {
 	console.log('msg', msg)
-	slack.chat.postMessage({ token, channel, text: JSON.stringify(msg)  })
+	slack.chat.postMessage({ token, channel, text: msg  })
 	.then(() => {
 		console.log('Slack message post success')
 		resolve({
